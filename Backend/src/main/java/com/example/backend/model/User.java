@@ -1,11 +1,15 @@
 package com.example.backend.model;
 
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
+import java.util.Collections;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,6 +18,8 @@ public class User {
     private String name;
     private String email;
     private String password;
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
 
     public Long getId() {
         return id;
@@ -39,8 +45,18 @@ public class User {
         this.email = email;
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singletonList(role);
+    }
+
     public String getPassword() {
         return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
     }
 
     public void setPassword(String password) {

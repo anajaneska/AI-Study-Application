@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import Features from './pages/Features';
 import LogIn from './pages/LogIn';
 import Users from './pages/Users';
+import FileUpload from './components/FileUpload';
 
 function App() {
     return (
@@ -13,6 +14,7 @@ function App() {
                 <Link to="/Features" className="nav-link">Features</Link>
                 <Link to="/Users" className="nav-link">Users</Link>
                 <Link to="/LogIn" className="nav-link">Log In</Link>
+                <Link to="/Summarizer" className="nav-link">Summarizer</Link>
             </nav>
 
             <Routes>
@@ -20,6 +22,7 @@ function App() {
                 <Route path="/Features" element={<Features />} />
                 <Route path="/Users" element={<Users />} />
                 <Route path="/LogIn" element={<LogIn />} />
+                <Route path="/Summarizer" element={<FileUpload />} />
             </Routes>
         </Router>
     );

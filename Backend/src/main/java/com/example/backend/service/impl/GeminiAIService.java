@@ -67,5 +67,3 @@ public class GeminiAIService implements AIService {
         return "Parsed summary";
     }
 }
-
-

@@ -1,0 +1,36 @@
+#loginSection {
+  display: grid;
+  justify-content: center;
+  margin-top: 3rem;
+}
+
+#loginSection > form > input {
+  border: 2px solid black;
+  width: 100%;
+  padding: 10px;
+}
+
+#loginSection > form > * {
+  margin-bottom: 10px;
+}
+
+#loginSection > form > label {
+  float: left;
+  clear: both;
+}
+
+#loginSection > form > input:last-of-type {
+  /* padding: 5px 115px; */
+  padding: 10px 150px;
+  width: 100%;
+  padding: 5px 115px;
+  cursor: pointer;
+  background-color: white;
+  border-color: rgb(61, 61, 255);
+  margin-top: 1rem;
+  margin-left: 10px;
+}
+
+#loginSection > form > input:last-of-type:hover {
+  background-color: rgb(217, 217, 245);
+}

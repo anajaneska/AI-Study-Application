@@ -1,31 +1,46 @@
-import './App.css';
+import "./App.css";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Home from "./pages/Home";
-import Features from './pages/Features';
-import LogIn from './pages/LogIn';
-import Users from './pages/Users';
-import FileUpload from './components/FileUpload';
+import Features from "./pages/Features";
+import LogIn from "./pages/LogIn";
+import Users from "./pages/Users";
+import FileUpload from "./components/FileUpload";
+import SignUp from "./pages/SignUp";
 
 function App() {
-    return (
-        <Router>
-            <nav className="navbar">
-                <Link to="/" className="nav-link">Home</Link>
-                <Link to="/Features" className="nav-link">Features</Link>
-                <Link to="/Users" className="nav-link">Users</Link>
-                <Link to="/LogIn" className="nav-link">Log In</Link>
-                <Link to="/Summarizer" className="nav-link">Summarizer</Link>
-            </nav>
+  return (
+    <Router>
+      <nav className="navbar">
+        <Link to="/" className="nav-link">
+          Home
+        </Link>
+        <Link to="/Features" className="nav-link">
+          Features
+        </Link>
+        <Link to="/Users" className="nav-link">
+          Users
+        </Link>
+        <Link to="/LogIn" className="nav-link">
+          Log In
+        </Link>
+        <Link to="/SignUp" className="nav-link">
+          Sign Up
+        </Link>
+        <Link to="/Summarizer" className="nav-link">
+          Summarizer
+        </Link>
+      </nav>
 
-            <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/Features" element={<Features />} />
-                <Route path="/Users" element={<Users />} />
-                <Route path="/LogIn" element={<LogIn />} />
-                <Route path="/Summarizer" element={<FileUpload />} />
-            </Routes>
-        </Router>
-    );
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/Features" element={<Features />} />
+        <Route path="/Users" element={<Users />} />
+        <Route path="/LogIn" element={<LogIn />} />
+        <Route path="/SignUp" element={<SignUp />} />
+        <Route path="/Summarizer" element={<FileUpload />} />
+      </Routes>
+    </Router>
+  );
 }
 
 export default App;

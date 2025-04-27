@@ -7,6 +7,7 @@ import Users from "./pages/Users";
 import FileUpload from "./components/FileUpload";
 import SignUp from "./pages/SignUp";
 import Flashcards from "./pages/Flashcards";
+import Pomodoro from "./pages/PomodoroTimer";
 
 function App() {
   return (
@@ -33,6 +34,9 @@ function App() {
         <Link to="/Flashcards" className="nav-link">
           Flashcards
         </Link>
+        <Link to="/Pomodoro" className="nav-link">
+          Pomodoro Timer
+        </Link>
       </nav>
 
       <Routes>
@@ -43,6 +47,7 @@ function App() {
         <Route path="/SignUp" element={<SignUp />} />
         <Route path="/Summarizer" element={<FileUpload />} />
         <Route path="/Flashcards" element={<Flashcards />}/>
+        <Route path="/Pomodoro" element={<Pomodoro />}/>
       </Routes>
     </Router>
   );

@@ -23,12 +23,12 @@
   /* padding: 10px 115px; */
   padding: 5px 115px;
   cursor: pointer;
-  background-color: white;
+  background-color: gray;
   border-color: rgb(61, 61, 255);
   margin-top: 1rem;
   margin-left: 10px;
 }
 
 #signupSection > form > input:last-of-type:hover {
-  background-color: rgb(217, 217, 245);
+  background-color: gray;
 }

@@ -1,0 +1,25 @@
+.loading {
+    font-size: 1.4rem;
+}
+
+.completed button{
+    background-color: rgb(5, 193, 5);
+    transition: background-color 0.3s;
+}
+
+.completed button:hover {
+    background-color: green;
+}
+
+.cards {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.cards button{
+    margin: 30px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    cursor: pointer;
+}

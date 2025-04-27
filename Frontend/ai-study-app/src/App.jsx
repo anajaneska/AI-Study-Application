@@ -6,6 +6,7 @@ import LogIn from "./pages/LogIn";
 import Users from "./pages/Users";
 import FileUpload from "./components/FileUpload";
 import SignUp from "./pages/SignUp";
+import Flashcards from "./pages/Flashcards";
 
 function App() {
   return (
@@ -29,6 +30,9 @@ function App() {
         <Link to="/Summarizer" className="nav-link">
           Summarizer
         </Link>
+        <Link to="/Flashcards" className="nav-link">
+          Flashcards
+        </Link>
       </nav>
 
       <Routes>
@@ -38,6 +42,7 @@ function App() {
         <Route path="/LogIn" element={<LogIn />} />
         <Route path="/SignUp" element={<SignUp />} />
         <Route path="/Summarizer" element={<FileUpload />} />
+        <Route path="/Flashcards" element={<Flashcards />}/>
       </Routes>
     </Router>
   );

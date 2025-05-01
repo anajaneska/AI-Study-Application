@@ -1,7 +1,6 @@
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Home from "./pages/Home";
-import Features from "./pages/Features";
 import LogIn from "./pages/LogIn";
 import Users from "./pages/Users";
 import FileUpload from "./components/FileUpload";
@@ -16,10 +15,7 @@ function App() {
         <Link to="/" className="nav-link">
           Home
         </Link>
-        <Link to="/Features" className="nav-link">
-          Features
-        </Link>
-        <Link to="/Users" className="nav-link">
+        <Link to="/users" className="nav-link">
           Users
         </Link>
         <Link to="/LogIn" className="nav-link">
@@ -41,13 +37,12 @@ function App() {
 
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/Features" element={<Features />} />
         <Route path="/Users" element={<Users />} />
-        <Route path="/LogIn" element={<LogIn />} />
-        <Route path="/SignUp" element={<SignUp />} />
-        <Route path="/Summarizer" element={<FileUpload />} />
-        <Route path="/Flashcards" element={<Flashcards />}/>
-        <Route path="/Pomodoro" element={<Pomodoro />}/>
+        <Route path="/logIn" element={<LogIn />} />
+        <Route path="/signUp" element={<SignUp />} />
+        <Route path="/summarizer" element={<FileUpload />} />
+        <Route path="/flashcards" element={<Flashcards />}/>
+        <Route path="/pomodoro" element={<Pomodoro />}/>
       </Routes>
     </Router>
   );

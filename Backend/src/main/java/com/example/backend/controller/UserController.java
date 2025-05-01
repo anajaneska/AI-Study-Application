@@ -9,9 +9,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -52,4 +54,30 @@ public class UserController {
         boolean deleted = userService.deleteUser(id);
         return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
+    @PostMapping("/signup")
+    public ResponseEntity<?> signup(@RequestBody User user) {
+        User savedUser = userService.createUser(user);
+        return ResponseEntity.ok(savedUser);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
+        String email = credentials.get("lEmail");
+        String password = credentials.get("lPassword");
+
+        return userService.loginUser(email, password)
+                .map(user -> {
+                    // Create a response map with a message
+                    Map<String, String> response = new HashMap<>();
+                    response.put("message", "Login successful");
+                    return ResponseEntity.ok(response);
+                })
+                .orElseGet(() -> {
+                    // Handle invalid credentials with a JSON response
+                    Map<String, String> response = new HashMap<>();
+                    response.put("message", "Invalid credentials");
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+                });
+    }
+
 }

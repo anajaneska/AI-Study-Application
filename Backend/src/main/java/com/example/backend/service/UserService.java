@@ -11,5 +11,6 @@ public interface UserService {
     User createUser(User user);
     Optional<User> updateUser(Long id, User userDetails);
     boolean deleteUser(Long id);
+    Optional<User> loginUser(String email, String rawPassword);
 
 }

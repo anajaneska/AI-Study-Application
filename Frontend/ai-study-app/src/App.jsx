@@ -18,7 +18,7 @@ function App() {
         <Link to="/users" className="nav-link">
           Users
         </Link>
-        <Link to="/LogIn" className="nav-link">
+        <Link to="/logIn" className="nav-link">
           Log In
         </Link>
         <Link to="/SignUp" className="nav-link">

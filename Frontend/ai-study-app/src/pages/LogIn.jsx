@@ -2,21 +2,52 @@ import { useState } from "react";
 import "./styling/LogIn.css";
 import { Link } from "react-router-dom";
 
-function LogIn() {
-  // const [lEmail, setLEmail] = useState("");
-  // const [lPassword, setLPassword] = useState("");
+import {useNavigate } from "react-router-dom";
 
+function LogIn() {
   const [userInfo, setUserInfo] = useState({
     lEmail: "",
     lPassword: "",
   });
+  
+  const navigate = useNavigate(); // For navigation after login
 
+  // Handling form submission
   function handleSubmit(e) {
     e.preventDefault();
 
-    console.log(userInfo);
+    // Send login request to backend
+    fetch("http://localhost:8080/api/users/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        lEmail: userInfo.lEmail,
+        lPassword: userInfo.lPassword,
+      }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json(); // If login is successful
+        } else {
+          throw new Error("Invalid credentials");
+        }
+      })
+      .then((data) => {
+        alert("Login successful!");
+        console.log(data); // You may handle user info or JWT token here
+
+        // Redirect to the home or dashboard page
+        navigate("/"); // Adjust based on your app's routes
+      })
+      .catch((error) => {
+        alert(error.message);
+        console.log(error);
+      });
   }
 
+  // Update userInfo state when credentials change
   function handleCredentials(identifier, value) {
     setUserInfo((prevUserInfo) => ({
       ...prevUserInfo,
@@ -66,3 +97,4 @@ function LogIn() {
 }
 
 export default LogIn;
+

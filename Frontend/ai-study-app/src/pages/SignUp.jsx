@@ -6,15 +6,20 @@ function SignUp() {
   const [userInfo, setUserInfo] = useState({
     name: "",
     surname: "",
-    rEmail: "",
-    rPassword: "",
+    email: "",
+    password: "",
   });
 
-  function handleSubmit(e) {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    console.log(userInfo);
-  }
+    await fetch('http://localhost:8080/api/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userInfo)  // Use userInfo instead of form
+    });
+    alert("User registered");
+  };
+  
 
   function handleCredentials(identifier, value) {
     setUserInfo((prevUserInfo) => ({
@@ -51,9 +56,9 @@ function SignUp() {
           <br />
           <input
             type="email"
-            name="rEmail"
-            onChange={(e) => handleCredentials("rEmail", e.target.value)}
-            value={userInfo.rEmail}
+            name="email"
+            onChange={(e) => handleCredentials("email", e.target.value)}
+            value={userInfo.email}
             placeholder="johndoe@example.com"
           />
           <br />
@@ -61,10 +66,10 @@ function SignUp() {
           <br />
           <input
             type="password"
-            name="rPassword"
-            onChange={(e) => handleCredentials("rPassword", e.target.value)}
-            value={userInfo.rPassword}
-            placeholder="Password"
+            name="password"
+            onChange={(e) => handleCredentials("password", e.target.value)}
+            value={userInfo.password}
+            placeholder="password"
           />
           <br />
           <input type="submit" value={"Sign up"} />

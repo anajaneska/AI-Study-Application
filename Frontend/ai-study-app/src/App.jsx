@@ -7,6 +7,7 @@ import FileUpload from "./components/FileUpload";
 import SignUp from "./pages/SignUp";
 import Flashcards from "./pages/Flashcards";
 import Pomodoro from "./pages/PomodoroTimer";
+import Calendar from "./pages/Calendar.jsx";
 
 function App() {
   return (
@@ -33,6 +34,9 @@ function App() {
         <Link to="/Pomodoro" className="nav-link">
           Pomodoro Timer
         </Link>
+        <Link to="/Calendar" className="nav-link">
+          Calendar
+        </Link>
       </nav>
 
       <Routes>
@@ -43,6 +47,7 @@ function App() {
         <Route path="/summarizer" element={<FileUpload />} />
         <Route path="/flashcards" element={<Flashcards />}/>
         <Route path="/pomodoro" element={<Pomodoro />}/>
+        <Route path="/calendar" element={<Calendar />}/>
       </Routes>
     </Router>
   );

@@ -1,0 +1,5 @@
+.main-content {
+    display: flex;
+    gap: 20px; /* adds space between items */
+    align-items: flex-start; /* optional: aligns items to the top */
+}

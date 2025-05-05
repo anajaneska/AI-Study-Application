@@ -1,7 +1,15 @@
+import PomodoroTimer from './PomodoroTimer';
+import Calendar from './Calendar'
+import "./styling/Home.css"
+
 function Home() {
     return (
         <div className="main-content">
-            <h1>Home</h1>
+            <div>
+                To Do list placeholder
+            </div>
+            <Calendar></Calendar>
+            <PomodoroTimer></PomodoroTimer>
         </div>
     )
 }

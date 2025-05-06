@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { addTaskForUser, getUserTasks } from '../services/userService';
 import './styling/ToDoList.css';
+import { FaTrash, FaEdit, FaCheck } from 'react-icons/fa';
 
 export default function ToDoList() {
     const [taskList, setTaskList] = useState([]);
@@ -45,14 +46,31 @@ export default function ToDoList() {
         }
     };
 
+    const handleDeleteTask = (taskId) => {
+        console.log(`Delete task with ID: ${taskId}`);
+        // delete logic
+    };
+
+    const handleMarkAsDone = (taskId) => {
+        console.log(`Mark task as done with ID: ${taskId}`);
+        // mark as done logic
+    };
+
     const transformTasks = (tasks) => {
         return tasks.map((task) => (
             <div key={task.id} className="task-item">
-                <h3 className="task-title">Title: {task?.title}</h3>
-                <p className="task-description">Desc: {task?.description}</p>
-                <span className={`task-status ${task?.isDone ? 'done' : 'not-done'}`}>
-                    {task.isDone ? "Done" : "Not Done"}
-                </span>
+                <div className="task-text">
+                    <span className={`task-title ${task.isDone ? 'done' : ''}`}>{task?.title}</span>
+                    <span className={`task-description ${task.isDone ? 'done' : ''}`}>{task?.description}</span>
+                </div>
+                <div className="task-actions">
+                    <button className="task-action-button" onClick={() => handleMarkAsDone(task.id)}>
+                        <FaCheck />
+                    </button>
+                    <button className="task-action-button" onClick={() => handleDeleteTask(task.id)}>
+                        <FaTrash />
+                    </button>
+                </div>
             </div>
         ));
     };

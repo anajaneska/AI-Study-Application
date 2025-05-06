@@ -6,11 +6,15 @@ import ToDoList from './ToDoList';
 function Home() {
     return (
         <div className="main-content">
-            <ToDoList />
-            <Calendar></Calendar>
-            <PomodoroTimer></PomodoroTimer>
+            <div className="top-section">
+                <Calendar />
+                <PomodoroTimer />
+            </div>
+            <div className="todo-section">
+                <ToDoList />
+            </div>
         </div>
-    )
+    );
 }
 
 export default Home

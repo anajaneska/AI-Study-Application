@@ -1,5 +1,16 @@
 .main-content {
     display: flex;
-    gap: 20px; /* adds space between items */
-    align-items: flex-start; /* optional: aligns items to the top */
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+}
+
+.top-section {
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+}
+
+.todo-section {
+    width: 100%;
 }

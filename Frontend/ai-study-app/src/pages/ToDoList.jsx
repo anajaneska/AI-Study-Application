@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { addTaskForUser, getUserTasks } from '../services/userService';
+import { addTaskForUser, getUserTasks, toggleTaskStatus } from '../services/userService';
 import './styling/ToDoList.css';
 import { FaTrash, FaEdit, FaCheck } from 'react-icons/fa';
 
@@ -13,6 +13,7 @@ export default function ToDoList() {
         setIsLoading(true);
         try {
             const response = await getUserTasks(1);
+            console.log("Fetched tasks:", response?.data);
             setTaskList(response?.data || []);
         } catch (error) {
             console.error("Error fetching tasks:", error);
@@ -51,28 +52,37 @@ export default function ToDoList() {
         // delete logic
     };
 
-    const handleMarkAsDone = (taskId) => {
-        console.log(`Mark task as done with ID: ${taskId}`);
-        // mark as done logic
+    const handleMarkAsDone = async (taskId) => {
+        setIsLoading(true);
+        try {
+            await toggleTaskStatus(taskId);
+            await fetchTasks();
+        } catch (error) {
+            console.error("Error toggling task status:", error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const transformTasks = (tasks) => {
-        return tasks.map((task) => (
-            <div key={task.id} className="task-item">
-                <div className="task-text">
-                    <span className={`task-title ${task.isDone ? 'done' : ''}`}>{task?.title}</span>
-                    <span className={`task-description ${task.isDone ? 'done' : ''}`}>{task?.description}</span>
+        return tasks.map((task) => {
+            return (
+                <div key={task.id} className="task-item">
+                    <div className="task-text">
+                        <span className={`task-title ${task.done ? 'done' : ''}`}>{task?.title}</span>
+                        <span className={`task-description ${task.done ? 'done' : ''}`}>{task?.description}</span>
+                    </div>
+                    <div className="task-actions">
+                        <button className="task-action-button" onClick={() => handleMarkAsDone(task.id)}>
+                            <FaCheck />
+                        </button>
+                        <button className="task-action-button" onClick={() => handleDeleteTask(task.id)}>
+                            <FaTrash />
+                        </button>
+                    </div>
                 </div>
-                <div className="task-actions">
-                    <button className="task-action-button" onClick={() => handleMarkAsDone(task.id)}>
-                        <FaCheck />
-                    </button>
-                    <button className="task-action-button" onClick={() => handleDeleteTask(task.id)}>
-                        <FaTrash />
-                    </button>
-                </div>
-            </div>
-        ));
+            );
+        });
     };
 
     return (

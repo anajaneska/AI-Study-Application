@@ -1,17 +1,20 @@
 import PomodoroTimer from './PomodoroTimer';
 import Calendar from './Calendar'
 import "./styling/Home.css"
+import ToDoList from './ToDoList';
 
 function Home() {
     return (
         <div className="main-content">
-            <div>
-                To Do list placeholder
+            <div className="top-section">
+                <Calendar />
+                <PomodoroTimer />
             </div>
-            <Calendar></Calendar>
-            <PomodoroTimer></PomodoroTimer>
+            <div className="todo-section">
+                <ToDoList />
+            </div>
         </div>
-    )
+    );
 }
 
 export default Home

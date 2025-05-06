@@ -15,4 +15,5 @@ public interface UserService {
     Optional<User> loginUser(String email, String rawPassword);
     Task createTask(Long userId, Task task);
     List<Task> getTasksByUserId(Long id);
+    void deleteTaskById(Long userId, Long taskId);
 }

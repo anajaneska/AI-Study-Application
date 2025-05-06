@@ -20,12 +20,10 @@ import java.util.Map;
 @RequestMapping("/api/users")
 public class UserController {
     private final UserService userService;
-    private final TaskService taskService;
 
     @Autowired
-    public UserController(UserService userService, TaskService taskService) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.taskService = taskService;
     }
 
     @GetMapping
@@ -86,7 +84,7 @@ public class UserController {
     }
 
     @PostMapping("/{userId}/addTask")
-    public ResponseEntity<Task> updateUser(@PathVariable Long userId, @RequestBody Task task) {
+    public ResponseEntity<Task> addTaskForUser(@PathVariable Long userId, @RequestBody Task task) {
         Task createdTask = userService.createTask(userId, task);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTask);
     }
@@ -95,11 +93,5 @@ public class UserController {
     public ResponseEntity<List<Task>> getUserTasks(@PathVariable Long userId) {
         List<Task> tasks = userService.getTasksByUserId(userId);
         return ResponseEntity.ok(tasks);
-    }
-
-    @GetMapping("/toggleIsDone/{taskId}")
-    public ResponseEntity<Boolean> toggleIsDone(@PathVariable Long taskId) {
-        boolean isDone = taskService.toggleIsDone(taskId);
-        return ResponseEntity.ok(isDone);
     }
 }

@@ -89,4 +89,11 @@ public class UserServiceImpl implements UserService {
         var user = userRepository.findById(id).get();
         return user.getTasks();
     }
+
+    @Override
+    public void deleteTaskById(Long userId, Long taskId) {
+        var user = userRepository.findById(userId).get();
+        user.getTasks().remove(taskRepository.findById(taskId).get());
+        userRepository.save(user);
+    }
 }

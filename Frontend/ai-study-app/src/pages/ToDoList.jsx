@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { addTaskForUser, getUserTasks, toggleTaskStatus } from '../services/userService';
+import { addTaskForUser, getUserTasks } from '../services/userService';
 import './styling/ToDoList.css';
-import { FaTrash, FaEdit, FaCheck } from 'react-icons/fa';
+import { FaTrash, FaCheck } from 'react-icons/fa';
+import { toggleTaskStatus, deleteTask } from "../services/taskService";
 
 export default function ToDoList() {
     const [taskList, setTaskList] = useState([]);
@@ -13,7 +14,6 @@ export default function ToDoList() {
         setIsLoading(true);
         try {
             const response = await getUserTasks(1);
-            console.log("Fetched tasks:", response?.data);
             setTaskList(response?.data || []);
         } catch (error) {
             console.error("Error fetching tasks:", error);
@@ -47,9 +47,16 @@ export default function ToDoList() {
         }
     };
 
-    const handleDeleteTask = (taskId) => {
-        console.log(`Delete task with ID: ${taskId}`);
-        // delete logic
+    const handleDeleteTask = async (taskId) => {
+        setIsLoading(true);
+        try {
+            await deleteTask(1, taskId)
+            await fetchTasks();
+        } catch (error) {
+            console.error("Error toggling task status:", error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleMarkAsDone = async (taskId) => {

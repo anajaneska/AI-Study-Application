@@ -6,22 +6,25 @@ export default function ToDoList() {
     const [taskList, setTaskList] = useState([]);
     const [newTaskName, setNewTaskName] = useState("");
     const [newTaskDescription, setNewTaskDescription] = useState("");
+    const [isLoading, setIsLoading] = useState(false); // Loading state
+
+    const fetchTasks = async () => {
+        setIsLoading(true);
+        try {
+            const response = await getUserTasks(1);
+            setTaskList(response?.data || []);
+        } catch (error) {
+            console.error("Error fetching tasks:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchTasks = async () => {
-            try {
-                const response = await getUserTasks(1);
-                setTaskList(response?.data || []);
-                console.log("Fetched tasks:", response?.data);
-            } catch (error) {
-                console.error("Error fetching tasks:", error);
-            }
-        };
-
         fetchTasks();
     }, []);
 
-    const handleAddTask = (e) => {
+    const handleAddTask = async (e) => {
         e.preventDefault();
         if (newTaskName.trim() === "" || newTaskDescription.trim() === "") return;
 
@@ -32,9 +35,10 @@ export default function ToDoList() {
         };
 
         try {
-            addTaskForUser(1, newTaskObj);
+            await addTaskForUser(1, newTaskObj);
             setNewTaskName("");
             setNewTaskDescription("");
+            await fetchTasks();
         }
         catch (error) {
             console.error("Error adding task:", error);
@@ -74,7 +78,11 @@ export default function ToDoList() {
                 <button type="submit" className="task-button">Add Task</button>
             </form>
             <div className="todo-list">
-                {taskList.length > 0 ? transformTasks(taskList) : <p className="no-tasks">No tasks available</p>}
+                {isLoading ? (
+                    <p className="loading-message">Loading tasks...</p>
+                ) : (
+                    taskList.length > 0 ? transformTasks(taskList) : <p className="no-tasks">No tasks available</p>
+                )}
             </div>
         </div>
     );

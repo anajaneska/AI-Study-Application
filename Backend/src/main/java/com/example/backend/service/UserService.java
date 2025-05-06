@@ -1,5 +1,6 @@
 package com.example.backend.service;
 
+import com.example.backend.model.Task;
 import com.example.backend.model.User;
 
 import java.util.List;
@@ -12,5 +13,6 @@ public interface UserService {
     Optional<User> updateUser(Long id, User userDetails);
     boolean deleteUser(Long id);
     Optional<User> loginUser(String email, String rawPassword);
-
+    Task createTask(Long userId, Task task);
+    List<Task> getTasksByUserId(Long id);
 }

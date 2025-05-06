@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.model.Task;
 import com.example.backend.model.User;
 import com.example.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,7 @@ public class UserController {
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         return userService.getUserById(id)
                 .map(ResponseEntity::ok)
-                .orElseGet(()-> ResponseEntity.notFound().build());
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
@@ -44,9 +45,9 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User userDetails) {
-        return userService.updateUser(id,userDetails)
+        return userService.updateUser(id, userDetails)
                 .map(ResponseEntity::ok)
-                .orElseGet(()-> ResponseEntity.notFound().build());
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
@@ -54,6 +55,7 @@ public class UserController {
         boolean deleted = userService.deleteUser(id);
         return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
+
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody User user) {
         User savedUser = userService.createUser(user);
@@ -80,4 +82,15 @@ public class UserController {
                 });
     }
 
+    @PostMapping("/{userId}/addTask")
+    public ResponseEntity<Task> updateUser(@PathVariable Long userId, @RequestBody Task task) {
+        Task createdTask = userService.createTask(userId, task);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdTask);
+    }
+
+    @GetMapping("/getUserTasks/{userId}")
+    public ResponseEntity<List<Task>> getUserTasks(@PathVariable Long userId) {
+        List<Task> tasks = userService.getTasksByUserId(userId);
+        return ResponseEntity.ok(tasks);
+    }
 }

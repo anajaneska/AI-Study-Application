@@ -3,6 +3,7 @@ import { CircularProgressbar } from 'react-circular-progressbar';
 import { FiSettings } from 'react-icons/fi';
 import 'react-circular-progressbar/dist/styles.css';
 import './styling/PomodoroTimer.css';
+import axios from 'axios';
 
 const PomodoroTimer = () => {
     const [focusDuration, setFocusDuration] = useState(parseInt(localStorage.getItem('focusDuration'), 10) || 25);
@@ -11,8 +12,11 @@ const PomodoroTimer = () => {
     const [isActive, setIsActive] = useState(JSON.parse(localStorage.getItem('isActive')) || false);
     const [isBreak, setIsBreak] = useState(JSON.parse(localStorage.getItem('isBreak')) || false);
     const [showSettings, setShowSettings] = useState(false);
+    const [sessionStartTime, setSessionStartTime] = useState(null);
+    const [sessions, setSessions] = useState([]);
 
-    // Save state to localStorage whenever relevant values change
+    const userId = 1;
+
     useEffect(() => {
         localStorage.setItem('focusDuration', focusDuration);
         localStorage.setItem('breakDuration', breakDuration);
@@ -21,14 +25,14 @@ const PomodoroTimer = () => {
         localStorage.setItem('isBreak', JSON.stringify(isBreak));
     }, [focusDuration, breakDuration, timeLeft, isActive, isBreak]);
 
-    // Handle the timer logic
     useEffect(() => {
         let timer = null;
         if (isActive) {
             timer = setInterval(() => {
-                setTimeLeft((prev) => {
+                setTimeLeft(prev => {
                     if (prev === 0) {
                         if (!isBreak) {
+                            savePomodoroSession(focusDuration);
                             setIsBreak(true);
                             sendNotification('Focus session ended. Time to take a break!');
                             return breakDuration * 60;
@@ -45,14 +49,32 @@ const PomodoroTimer = () => {
         return () => clearInterval(timer);
     }, [isActive, isBreak, focusDuration, breakDuration]);
 
-    const sendNotification = (message) => {
-        if (Notification.permission === 'granted') {
-            new Notification(message);
+    const savePomodoroSession = async (durationMinutes) => {
+        const sessionData = {
+            duration: durationMinutes,
+            startTime: sessionStartTime || new Date().toISOString()
+        };
+        try {
+            await axios.post(`http://localhost:8080/api/sessions/${userId}`, sessionData);
+            console.log("Session saved.");
+        } catch (err) {
+            console.error("Error saving session:", err);
+        }
+    };
+
+    const fetchSessions = async () => {
+        if (!userId) return;
+        try {
+            const res = await axios.get(`http://localhost:8080/api/sessions/${userId}`);
+            setSessions(res.data);
+        } catch (err) {
+            console.error("Error fetching sessions:", err);
         }
     };
 
     const toggleSettings = () => {
         setShowSettings(!showSettings);
+        if (!showSettings) fetchSessions();
     };
 
     const handleSettingsSubmit = (e) => {
@@ -67,7 +89,16 @@ const PomodoroTimer = () => {
     };
 
     const startStopTimer = () => {
+        if (!isActive) {
+            setSessionStartTime(new Date().toISOString());
+        }
         setIsActive(!isActive);
+    };
+
+    const sendNotification = (message) => {
+        if (Notification.permission === 'granted') {
+            new Notification(message);
+        }
     };
 
     const minutes = Math.floor(timeLeft / 60);
@@ -109,9 +140,8 @@ const PomodoroTimer = () => {
                 </div>
             </div>
 
-            {/* Settings Side Panel */}
             <div className={`settings-panel ${showSettings ? 'open' : ''}`}>
-                <h3>Settings</h3>
+                <h3>Settings for {userId}</h3>
                 <form onSubmit={handleSettingsSubmit}>
                     <div>
                         <label>Focus Time (minutes):</label>
@@ -123,6 +153,15 @@ const PomodoroTimer = () => {
                     </div>
                     <button type="submit">Save Settings</button>
                 </form>
+
+                <h4>Your Pomodoro Sessions</h4>
+                <ul>
+                    {sessions.map((s, i) => (
+                        <li key={i}>
+                            {new Date(s.startTime).toLocaleString()} - {s.duration} min
+                        </li>
+                    ))}
+                </ul>
             </div>
         </>
     );

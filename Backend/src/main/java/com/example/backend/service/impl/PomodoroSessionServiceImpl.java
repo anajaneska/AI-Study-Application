@@ -19,11 +19,18 @@ public class PomodoroSessionServiceImpl implements PomodoroSessionService {
     @Autowired
     private UserRepository userRepository;
 
+    @Override
     public PomodoroSession saveSession(Long userId, PomodoroSession session) {
         Optional<User> user = userRepository.findById(userId);
         user.ifPresent(session::setUser);
+
+        if (session.getStartTime() != null && session.getDuration() > 0) {
+            session.setEndTime(session.getStartTime().plusMinutes(session.getDuration()));
+        }
+
         return sessionRepository.save(session);
     }
+
 
     public List<PomodoroSession> getSessionsByUser(Long userId) {
         return sessionRepository.findByUserId(userId);

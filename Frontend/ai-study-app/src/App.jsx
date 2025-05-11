@@ -10,6 +10,8 @@ import Pomodoro from "./pages/PomodoroTimer";
 import Calendar from "./pages/Calendar.jsx";
 
 function App() {
+  const user = JSON.parse(localStorage.getItem('user'));
+
   return (
     <Router>
       <nav className="navbar">
@@ -28,6 +30,7 @@ function App() {
         <Link to="/Flashcards" className="nav-link">
           Flashcards
         </Link>
+        {user ? (<span className="user-info">Welcome, {user.name}!</span>) : (<span></span>)}
       </nav>
 
       <Routes>

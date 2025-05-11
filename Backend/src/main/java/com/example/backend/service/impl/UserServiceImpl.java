@@ -86,8 +86,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<Task> getTasksByUserId(Long id) {
-        var user = userRepository.findById(id).get();
-        return user.getTasks();
+        return userRepository.findById(id)
+            .map(User::getTasks)
+            .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
     }
 
     @Override

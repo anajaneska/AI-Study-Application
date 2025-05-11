@@ -1,5 +1,7 @@
 package com.example.backend.controller;
 
+import com.example.backend.model.Summary;
+import com.example.backend.repository.SummaryRepository;
 import com.example.backend.service.impl.GeminiAIService;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,44 +11,65 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.HttpStatus;
 import org.apache.pdfbox.pdmodel.PDDocument;
 
-
-
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.UUID;
+import java.util.List;
+import java.util.ArrayList;
+import java.lang.StringBuilder;
 
 @RestController
 @RequestMapping("/api/summarize")
+@CrossOrigin(origins = "http://localhost:5173")
 public class SummarizationController {
 
     @Autowired
     private GeminiAIService aiService;
 
-    private static final String SUMMARY_DIRECTORY = "summaries/";
+    @Autowired
+    private SummaryRepository summaryRepository;
 
     @PostMapping("/upload")
     public ResponseEntity<?> uploadAndSummarize(@RequestParam("file") MultipartFile file) {
         try {
             String text = extractTextFromPdf(file);
-
-            if (text.length() > 8000) {
-                return ResponseEntity.badRequest().body("PDF too long to summarize in one call.");
+            List<String> chunks = splitTextIntoChunks(text, 8000);
+            
+            StringBuilder finalSummary = new StringBuilder();
+            for (int i = 0; i < chunks.size(); i++) {
+                String chunkSummary = aiService.getSummary(chunks.get(i));
+                finalSummary.append("Part ").append(i + 1).append(":\n").append(chunkSummary).append("\n\n");
             }
 
-            String summary = aiService.getSummary(text);
+            // Save summary to database
+            Summary summaryEntity = new Summary();
+            summaryEntity.setContent(finalSummary.toString());
+            summaryEntity.setOriginalFileName(file.getOriginalFilename());
+            summaryEntity.setCreatedAt(LocalDateTime.now());
+            summaryEntity.setHasFlashcards(false);
+            summaryRepository.save(summaryEntity);
 
-            // Save summary to a file
-            String summaryFileName = UUID.randomUUID().toString() + ".txt";
-            saveSummaryToFile(summary, summaryFileName);
-
-            // Return the download URL
-            String downloadUrl = "/api/summarize/download/" + summaryFileName;
-            return ResponseEntity.ok(Map.of("summary", summary, "downloadUrl", downloadUrl));
+            return ResponseEntity.ok(Map.of(
+                "summary", finalSummary.toString(),
+                "summaryId", summaryEntity.getId()
+            ));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing file.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing file: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/summaries")
+    public ResponseEntity<?> getSummaries() {
+        return ResponseEntity.ok(summaryRepository.findAll());
+    }
+
+    @DeleteMapping("/summaries/{summaryId}")
+    public ResponseEntity<?> deleteSummary(@PathVariable Long summaryId) {
+        try {
+            summaryRepository.deleteById(summaryId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 
@@ -60,23 +83,29 @@ public class SummarizationController {
         }
     }
 
-    private void saveSummaryToFile(String summary, String summaryFileName) throws IOException {
-        Path path = Paths.get(SUMMARY_DIRECTORY + summaryFileName);
-        Files.createDirectories(path.getParent()); // Ensure the directory exists
-        Files.write(path, summary.getBytes());
-    }
-
-    // Endpoint to download the generated summary
-    @GetMapping("/download/{summaryFileName}")
-    public ResponseEntity<byte[]> downloadSummary(@PathVariable String summaryFileName) throws IOException {
-        Path path = Paths.get(SUMMARY_DIRECTORY + summaryFileName);
-        if (!Files.exists(path)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+    private List<String> splitTextIntoChunks(String text, int maxChunkSize) {
+        List<String> chunks = new ArrayList<>();
+        int startIndex = 0;
+        
+        while (startIndex < text.length()) {
+            int endIndex = Math.min(startIndex + maxChunkSize, text.length());
+            
+            // If we're not at the end of the text, try to find a good breaking point
+            if (endIndex < text.length()) {
+                // Look for the last period or newline within the last 100 characters
+                int lastPeriod = text.lastIndexOf('.', endIndex);
+                int lastNewline = text.lastIndexOf('\n', endIndex);
+                int breakPoint = Math.max(lastPeriod, lastNewline);
+                
+                if (breakPoint > startIndex + maxChunkSize * 0.8) { // Only use break point if it's not too far back
+                    endIndex = breakPoint + 1;
+                }
+            }
+            
+            chunks.add(text.substring(startIndex, endIndex).trim());
+            startIndex = endIndex;
         }
-
-        byte[] content = Files.readAllBytes(path);
-        return ResponseEntity.ok()
-                .header("Content-Disposition", "attachment; filename=" + summaryFileName)
-                .body(content);
+        
+        return chunks;
     }
 }

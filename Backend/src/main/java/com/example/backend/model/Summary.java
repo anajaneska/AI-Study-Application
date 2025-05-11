@@ -6,21 +6,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Entity class representing a summary in the database.
- * Maps to the 'summaries' table with the following structure:
- * 
- * Table: summaries
- * - id: BIGINT (Primary Key, Auto-generated)
- * - content: TEXT (NOT NULL)
- * - original_file_name: VARCHAR (NOT NULL)
- * - created_at: TIMESTAMP (NOT NULL)
- * - has_flashcards: BOOLEAN (NOT NULL, default false)
- * 
- * Related tables:
- * - flashcards: One-to-Many relationship with flashcards
- * - user_summaries: Many-to-Many relationship with users
- */
+
 @Entity
 @Table(name = "summaries")
 public class Summary {

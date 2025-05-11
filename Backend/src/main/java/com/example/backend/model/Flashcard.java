@@ -5,22 +5,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Entity class representing a flashcard in the database.
- * Maps to the 'flashcards' table with the following structure:
- * 
- * Table: flashcards
- * - id: BIGINT (Primary Key, Auto-generated)
- * - question: TEXT (NOT NULL)
- * - correct_answer_index: INTEGER (NOT NULL)
- * - summary_id: BIGINT (Foreign Key to summaries.id)
- * - is_answered: BOOLEAN (NOT NULL, default false)
- * - is_correct: BOOLEAN (NOT NULL, default false)
- * - attempts: INTEGER (NOT NULL, default 0)
- * 
- * Related tables:
- * - flashcard_answers: One-to-Many relationship with answers
- */
+
 @Entity
 @Table(name = "flashcards")
 public class Flashcard {

@@ -12,10 +12,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.HttpStatus;
 import org.apache.pdfbox.pdmodel.PDDocument;
 
-
-
 import java.io.IOException;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/summarize")
@@ -25,18 +23,29 @@ public class SummarizationController {
     private GeminiAIService aiService;
 
     @PostMapping("/upload")
-    public ResponseEntity<?> uploadAndSummarize(@RequestParam("file") MultipartFile file) {
-        try {
-            String text = extractTextFromPdf(file);
+    public ResponseEntity<?> uploadAndSummarize(@RequestParam("files") MultipartFile[] files) {
+        if (files == null || files.length == 0) {
+            return ResponseEntity.badRequest().body("No files uploaded.");
+        }
 
-            if (text.length() > 8000) {
-                return ResponseEntity.badRequest().body("PDF too long to summarize in one call.");
+        Map<String, String> summaries = new HashMap<>();
+
+        try {
+            for (MultipartFile file : files) {
+                String text = extractTextFromPdf(file);
+
+                if (text.length() > 8000) {
+                    summaries.put(file.getOriginalFilename(), "PDF too long to summarize in one call.");
+                } else {
+                    String summary = aiService.getSummary(text);
+                    summaries.put(file.getOriginalFilename(), summary);
+                }
             }
 
-            String summary = aiService.getSummary(text);
-            return ResponseEntity.ok(Map.of("summary", summary));
+            return ResponseEntity.ok(summaries);
+
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing file.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing files.");
         }
     }
 
@@ -44,9 +53,6 @@ public class SummarizationController {
         try (PDDocument document = PDDocument.load(file.getInputStream())) {
             PDFTextStripper stripper = new PDFTextStripper();
             return stripper.getText(document);
-        } catch (IOException e) {
-            e.printStackTrace(); // ← see what happened here
-            throw e;
         }
     }
 }

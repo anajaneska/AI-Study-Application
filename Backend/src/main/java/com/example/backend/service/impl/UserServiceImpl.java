@@ -1,6 +1,8 @@
 package com.example.backend.service.impl;
 
+import com.example.backend.model.Task;
 import com.example.backend.model.User;
+import com.example.backend.repository.TaskRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,15 +11,19 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
     private final UserRepository userRepository;
     @Autowired
+    private final TaskRepository taskRepository;
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, TaskRepository taskRepository) {
         this.userRepository = userRepository;
+        this.taskRepository = taskRepository;
     }
 
     @Override
@@ -55,7 +61,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean deleteUser(Long id) {
-        return userRepository.findById(id).map(user->{
+        return userRepository.findById(id).map(user -> {
             userRepository.delete(user);
             return true;
         }).orElse(false);
@@ -67,5 +73,28 @@ public class UserServiceImpl implements UserService {
             return user;
         }
         return Optional.empty();
+    }
+
+    @Override
+    public Task createTask(Long userId, Task task) {
+        var user = userRepository.findById(userId).get();
+        taskRepository.save(task);
+        user.getTasks().add(task);
+        userRepository.save(user);
+        return task;
+    }
+
+    @Override
+    public List<Task> getTasksByUserId(Long id) {
+        return userRepository.findById(id)
+            .map(User::getTasks)
+            .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+    }
+
+    @Override
+    public void deleteTaskById(Long userId, Long taskId) {
+        var user = userRepository.findById(userId).get();
+        user.getTasks().remove(taskRepository.findById(taskId).get());
+        userRepository.save(user);
     }
 }

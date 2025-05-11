@@ -10,14 +10,13 @@ import Pomodoro from "./pages/PomodoroTimer";
 import Calendar from "./pages/Calendar.jsx";
 
 function App() {
+  const user = JSON.parse(localStorage.getItem('user'));
+
   return (
     <Router>
       <nav className="navbar">
         <Link to="/" className="nav-link">
-          Home
-        </Link>
-        <Link to="/users" className="nav-link">
-          Users
+          AI Study Application
         </Link>
         <Link to="/logIn" className="nav-link">
           Log In
@@ -31,12 +30,7 @@ function App() {
         <Link to="/Flashcards" className="nav-link">
           Flashcards
         </Link>
-        <Link to="/Pomodoro" className="nav-link">
-          Pomodoro Timer
-        </Link>
-        <Link to="/Calendar" className="nav-link">
-          Calendar
-        </Link>
+        {user ? (<span className="user-info">Welcome, {user.name}!</span>) : (<span></span>)}
       </nav>
 
       <Routes>

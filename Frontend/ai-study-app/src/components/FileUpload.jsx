@@ -1,92 +1,124 @@
 // src/FileUpload.js
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../config/api';
+import './FileUpload.css';
 
-function FileUpload() {
+const FileUpload = () => {
     const [files, setFiles] = useState([]);
-    const [summaries, setSummaries] = useState({});
-    const [error, setError] = useState('');
+    const [summary, setSummary] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [progress, setProgress] = useState(0);
 
-    const handleFileChange = (e) => {
-        setFiles(Array.from(e.target.files));
+    const handleFileChange = (event) => {
+        const selectedFiles = Array.from(event.target.files);
+        const validFiles = selectedFiles.filter(file => file.type === 'application/pdf');
+
+        if (validFiles.length === 0) {
+            setFiles([]);
+            setError('Please select valid PDF files');
+        } else {
+            setFiles(validFiles);
+            setError(null);
+        }
     };
 
     const handleUpload = async () => {
         if (files.length === 0) {
-            setError("Please select at least one PDF file.");
+            setError('Please select at least one PDF file');
             return;
         }
 
+        setLoading(true);
+        setError(null);
+        setSummary('');
+        setProgress(0);
+
         const formData = new FormData();
         files.forEach(file => {
-            formData.append("files", file);
+            formData.append('file', file);
         });
 
         try {
-            const response = await axios.post("http://localhost:8080/api/summarize/upload", formData, {
-                headers: { "Content-Type": "multipart/form-data" }
+            const response = await api.post('/api/summarize/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+                onUploadProgress: (progressEvent) => {
+                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    setProgress(percentCompleted);
+                },
             });
-            setSummaries(response.data);
-            setError('');
-            // eslint-disable-next-line no-unused-vars
-        } catch (err) {
-            setError("Error uploading files. Please try again.");
-            setSummaries({});
+
+            if (response.data && response.data.summary) {
+                setSummary(response.data.summary);
+            } else {
+                throw new Error('Invalid response format');
+            }
+        } catch (error) {
+            console.error('Error uploading file:', error);
+            if (error.response) {
+                setError(error.response.data || 'Failed to upload file. Please try again.');
+            } else if (error.request) {
+                setError('No response from server. Please check if the backend is running.');
+            } else {
+                setError('Failed to upload file. Please try again.');
+            }
+        } finally {
+            setLoading(false);
+            setProgress(0);
         }
     };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '30px', fontFamily: 'Arial, sans-serif' }}>
-            <h2 style={{ marginBottom: '20px' }}>Upload PDFs to Summarize</h2>
+        <div className="file-upload-container">
+            <h2>Upload PDFs for Summarization</h2>
+            <div className="file-upload-box">
+                <input
+                    type="file"
+                    onChange={handleFileChange}
+                    accept=".pdf"
+                    multiple
+                    className="file-input"
+                    id="file-input"
+                />
+                <label htmlFor="file-input" className="file-input-label">
+                    {files.length > 0 ? `${files.length} file(s) selected` : 'Choose PDF files'}
+                </label>
+                <button
+                    onClick={handleUpload}
+                    disabled={loading || files.length === 0}
+                    className="upload-button"
+                >
+                    {loading ? 'Processing...' : 'Upload and Summarize'}
+                </button>
+                {loading && (
+                    <div className="progress-bar">
+                        <div
+                            className="progress-bar-fill"
+                            style={{ width: `${progress}%` }}
+                        />
+                        <span className="progress-text">{progress}%</span>
+                    </div>
+                )}
+            </div>
 
-            <input
-                type="file"
-                accept="application/pdf"
-                multiple
-                onChange={handleFileChange}
-                style={{
-                    padding: '10px',
-                    borderRadius: '5px',
-                    border: '1px solid #ccc',
-                    marginBottom: '15px',
-                    width: '300px'
-                }}
-            />
+            {error && <div className="error-message">{error}</div>}
 
-            <button
-                onClick={handleUpload}
-                style={{
-                    padding: '10px 20px',
-                    border: 'none',
-                    borderRadius: '5px',
-                    backgroundColor: '#007bff',
-                    color: 'white',
-                    cursor: 'pointer',
-                    fontSize: '16px',
-                    marginBottom: '20px'
-                }}
-            >
-                Upload
-            </button>
-
-            {Object.keys(summaries).length > 0 && (
-                <div style={{ maxWidth: '800px' }}>
-                    <h3>Summaries:</h3>
-                    <ul style={{ listStyleType: 'none', padding: 0 }}>
-                        {Object.entries(summaries).map(([filename, summary]) => (
-                            <li key={filename} style={{ marginBottom: '20px' }}>
-                                <strong>{filename}</strong>
-                                <p style={{ whiteSpace: 'pre-wrap', backgroundColor: '#f8f8f8', padding: '10px', borderRadius: '5px' }}>
-                                    {summary}
-                                </p>
-                            </li>
+            {summary && (
+                <div className="summary-container">
+                    <h3>Summary:</h3>
+                    <div className="summary-content">
+                        {summary.split('\n\n').map((part, index) => (
+                            <div key={index} className="summary-part">
+                                {part}
+                            </div>
                         ))}
-                    </ul>
+                    </div>
                 </div>
             )}
-
-            {error && <p style={{ color: "red", marginTop: '10px' }}>{error}</p>}
         </div>
     );
-}
+};
+
 export default FileUpload;

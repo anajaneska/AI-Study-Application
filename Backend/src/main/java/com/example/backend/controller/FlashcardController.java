@@ -2,10 +2,15 @@ package com.example.backend.controller;
 
 import com.example.backend.model.Flashcard;
 import com.example.backend.service.FlashcardService;
+import org.springframework.core.io.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -67,4 +72,43 @@ public class FlashcardController {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
-} 
+
+    @GetMapping("/download/{summaryId}")
+    public ResponseEntity<Resource> downloadFlashcards(@PathVariable Long summaryId) {
+        try {
+            String fileName = "flashcards-summary-" + summaryId + ".txt";
+            List<Flashcard> flashcards = flashcardService.getFlashcardsBySummaryId(summaryId);
+
+            StringBuilder content = new StringBuilder();
+            for (Flashcard flashcard : flashcards) {
+                content.append("Q: ").append(flashcard.getQuestion()).append("\n");
+
+                List<String> answers = flashcard.getAnswers();
+                for (int i = 0; i < answers.size(); i++) {
+                    content.append("   ").append((char) ('A' + i)).append(") ").append(answers.get(i)).append("\n");
+                }
+
+                Integer correctIndex = flashcard.getCorrectAnswerIndex();
+                if (correctIndex != null && correctIndex >= 0 && correctIndex < answers.size()) {
+                    content.append("Answer: ").append(answers.get(correctIndex)).append("\n\n");
+                } else {
+                    content.append("Answer: Not specified\n\n");
+                }
+            }
+
+            ByteArrayResource resource = new ByteArrayResource(content.toString().getBytes(StandardCharsets.UTF_8));
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + fileName)
+                    .contentType(MediaType.TEXT_PLAIN)
+                    .contentLength(resource.contentLength())
+                    .body(resource);
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+
+
+}

@@ -16,3 +16,30 @@ export const saveTestResult = (summaryId, testResult) => {
     return api.post(`/api/tests/${summaryId}/results`, testResult);
 };
 export const deleteTest = (testId) => api.delete(`/api/tests/${testId}`); 
+
+
+export const downloadFlashcards = async (summaryId) => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/flashcards/download/${summaryId}`);
+  
+      if (!response.ok) {
+        throw new Error("Failed to download flashcards.");
+      }
+  
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+  
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `flashcards-summary-${summaryId}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error downloading flashcards:", error);
+      alert("Error downloading flashcards. Please try again.");
+    }
+  };
+  
+  

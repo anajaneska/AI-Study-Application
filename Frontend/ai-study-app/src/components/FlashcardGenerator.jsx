@@ -12,6 +12,7 @@ import {
     saveTestResult,
     deleteTest
 } from '../services/flashcardService';
+import { downloadFlashcards } from '../services/flashcardService';
 
 const FlashcardGenerator = () => {
     const [flashcards, setFlashcards] = useState([]);
@@ -332,6 +333,20 @@ const FlashcardGenerator = () => {
                                             >
                                                 Generate New Flashcards
                                             </button>
+                                            <button
+                                                    onClick={() => downloadFlashcards(selectedSummaryId)}
+                                                    style={{
+                                                        padding: "10px 16px",
+                                                        backgroundColor: "#2563eb",
+                                                        color: "white",
+                                                        border: "none",
+                                                        borderRadius: "8px",
+                                                        marginTop: "10px"
+                                                    }}
+                                                    >
+                                                    Download Flashcards
+                                            </button>
+
                                         </>
                                     )}
                                     <button 

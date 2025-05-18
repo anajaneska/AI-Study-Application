@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.configs.JwtConfig;
 import com.example.backend.model.Task;
 import com.example.backend.model.User;
 import com.example.backend.service.TaskService;
@@ -8,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -19,10 +23,14 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
+    private final JwtConfig jwtConfig;
+    private final AuthenticationManager authenticationManager;
     private final UserService userService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(JwtConfig jwtConfig, AuthenticationManager authenticationManager, UserService userService) {
+        this.jwtConfig = jwtConfig;
+        this.authenticationManager = authenticationManager;
         this.userService = userService;
     }
 
@@ -65,36 +73,38 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
-        String email = credentials.get("lEmail");
-        String password = credentials.get("lPassword");
+        String email = credentials.get("username");
+        String password = credentials.get("password");
+//        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
+        String token = jwtConfig.generateToken(email);
 
         return userService.loginUser(email, password)
                 .map(user -> {
-                    // Create a response map with a message
                     Map<String, String> response = new HashMap<>();
                     response.put("id", String.valueOf(user.getId()));
-                    response.put("name", user.getName());
+                    response.put("token", token);
                     response.put("email", user.getEmail());
                     response.put("message", "Login successful");
                     return ResponseEntity.ok(response);
                 })
                 .orElseGet(() -> {
-                    // Handle invalid credentials with a JSON response
                     Map<String, String> response = new HashMap<>();
                     response.put("message", "Invalid credentials");
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
                 });
     }
 
-    @PostMapping("/{userId}/addTask")
-    public ResponseEntity<Task> addTaskForUser(@PathVariable Long userId, @RequestBody Task task) {
-        Task createdTask = userService.createTask(userId, task);
+    @PostMapping("/addTask")
+    public ResponseEntity<Task> addTaskForUser(@RequestBody Task task, Authentication authentication) {
+        String email = authentication.getName();
+        Task createdTask = userService.createTask(email, task);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTask);
     }
 
-    @GetMapping("/getUserTasks/{userId}")
-    public ResponseEntity<List<Task>> getUserTasks(@PathVariable Long userId) {
-        List<Task> tasks = userService.getTasksByUserId(userId);
+    @GetMapping("/getUserTasks")
+    public ResponseEntity<List<Task>> getUserTasks(Authentication authentication) {
+        String email = authentication.getName();
+        List<Task> tasks = userService.getTasksByUserEmail(email);
         return ResponseEntity.ok(tasks);
     }
 }

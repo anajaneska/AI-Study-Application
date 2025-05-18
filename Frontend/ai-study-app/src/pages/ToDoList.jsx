@@ -13,7 +13,7 @@ export default function ToDoList() {
     const fetchTasks = async () => {
         setIsLoading(true);
         try {
-            const response = await getUserTasks(1);
+            const response = await getUserTasks();
             setTaskList(response?.data || []);
         } catch (error) {
             console.error("Error fetching tasks:", error);
@@ -72,6 +72,8 @@ export default function ToDoList() {
     };
 
     const transformTasks = (tasks) => {
+        if (!Array.isArray(tasks) || tasks.length === 0) return null;
+
         return tasks.map((task) => {
             return (
                 <div key={task.id} className="task-item">

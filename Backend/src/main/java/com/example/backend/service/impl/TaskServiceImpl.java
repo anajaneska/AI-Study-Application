@@ -28,8 +28,8 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public void deleteTaskById(Long userId, Long taskId) {
-        userService.deleteTaskById(userId, taskId);
+    public void deleteTaskById(String userEmail, Long taskId) {
+        userService.deleteTaskById(userEmail, taskId);
         taskRepository.deleteById(taskId);
     }
 }

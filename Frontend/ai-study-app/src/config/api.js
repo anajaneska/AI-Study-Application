@@ -2,7 +2,6 @@ import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:8080';
 
-// Create an axios instance with default config
 const api = axios.create({
     baseURL: API_BASE_URL,
     headers: {
@@ -11,19 +10,20 @@ const api = axios.create({
     }
 });
 
-// Add request interceptor for logging
-api.interceptors.request.use(
-    (config) => {
-        console.log('API Request:', config.method.toUpperCase(), config.url, config.data);
-        return config;
-    },
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem("jwt");
+    if (token) {
+        config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    console.log('API Request:', config.method.toUpperCase(), config.url, config.headers, config.data);
+    return config;
+},
     (error) => {
         console.error('API Request Error:', error);
         return Promise.reject(error);
     }
 );
 
-// Add response interceptor for logging
 api.interceptors.response.use(
     (response) => {
         console.log('API Response:', response.status, response.data);

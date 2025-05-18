@@ -41,6 +41,7 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Password cannot be null or empty");
         }
         String encodedPassword = passwordEncoder.encode(user.getPassword());
+        user.setUsername(user.getEmail());
         user.setPassword(encodedPassword);
         return userRepository.save(user);
     }
@@ -76,8 +77,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Task createTask(Long userId, Task task) {
-        var user = userRepository.findById(userId).get();
+    public Task createTask(String email, Task task) {
+        var user = userRepository.findByEmail(email).get();
         taskRepository.save(task);
         user.getTasks().add(task);
         userRepository.save(user);
@@ -85,15 +86,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<Task> getTasksByUserId(Long id) {
-        return userRepository.findById(id)
+    public List<Task> getTasksByUserEmail(String email) {
+        return userRepository.findByEmail(email)
             .map(User::getTasks)
-            .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+            .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
     }
 
     @Override
-    public void deleteTaskById(Long userId, Long taskId) {
-        var user = userRepository.findById(userId).get();
+    public void deleteTaskById(String userEmail, Long taskId) {
+        var user = userRepository.findByEmail(userEmail).get();
         user.getTasks().remove(taskRepository.findById(taskId).get());
         userRepository.save(user);
     }

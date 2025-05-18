@@ -20,8 +20,8 @@ public class PomodoroSessionServiceImpl implements PomodoroSessionService {
     private UserRepository userRepository;
 
     @Override
-    public PomodoroSession saveSession(Long userId, PomodoroSession session) {
-        Optional<User> user = userRepository.findById(userId);
+    public PomodoroSession saveSession(String email, PomodoroSession session) {
+        Optional<User> user = userRepository.findByEmail(email);
         user.ifPresent(session::setUser);
 
         if (session.getStartTime() != null && session.getDuration() > 0) {
@@ -32,7 +32,9 @@ public class PomodoroSessionServiceImpl implements PomodoroSessionService {
     }
 
 
-    public List<PomodoroSession> getSessionsByUser(Long userId) {
-        return sessionRepository.findByUserId(userId);
+    public List<PomodoroSession> getSessionsByUser(String email) {
+        Optional<User> user = userRepository.findByEmail(email);
+
+        return sessionRepository.findByUserId(user.get().getId());
     }
 }

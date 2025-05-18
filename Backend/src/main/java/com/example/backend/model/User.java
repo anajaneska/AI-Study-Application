@@ -1,27 +1,31 @@
 package com.example.backend.model;
 
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
 
 /**
  * Entity class representing a user in the database.
  * Maps to the 'users' table with the following structure:
- * 
+ * <p>
  * Table: users
  * - id: BIGINT (Primary Key, Auto-generated)
  * - username: VARCHAR (NOT NULL, UNIQUE)
  * - email: VARCHAR (NOT NULL, UNIQUE)
  * - password: VARCHAR (NOT NULL)
  * - name: VARCHAR (NOT NULL)
- * 
+ * <p>
  * Related tables:
  * - user_summaries: Many-to-Many relationship with summaries
  * - user_tasks: Many-to-Many relationship with tasks
  */
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,17 +45,17 @@ public class User {
 
     @ManyToMany
     @JoinTable(
-        name = "user_summaries",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "summary_id")
+            name = "user_summaries",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "summary_id")
     )
     private List<Summary> summaries = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(
-        name = "user_tasks",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "task_id")
+            name = "user_tasks",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "task_id")
     )
     private List<Task> tasks = new ArrayList<>();
 
@@ -70,6 +74,26 @@ public class User {
         return username;
     }
 
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
     public void setUsername(String username) {
         this.username = username;
     }
@@ -80,6 +104,11 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
     }
 
     public String getPassword() {

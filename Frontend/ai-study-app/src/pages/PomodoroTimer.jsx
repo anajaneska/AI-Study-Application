@@ -3,7 +3,9 @@ import { CircularProgressbar } from 'react-circular-progressbar';
 import { FiSettings } from 'react-icons/fi';
 import 'react-circular-progressbar/dist/styles.css';
 import './styling/PomodoroTimer.css';
-import axios from 'axios';
+import { saveSession } from '../services/pomodoroTimerService';
+import { getUserSessions } from '../services/pomodoroTimerService';
+
 
 const PomodoroTimer = () => {
     const [focusDuration, setFocusDuration] = useState(parseInt(localStorage.getItem('focusDuration'), 10) || 25);
@@ -55,7 +57,7 @@ const PomodoroTimer = () => {
             startTime: sessionStartTime || new Date().toISOString()
         };
         try {
-            await axios.post(`http://localhost:8080/api/sessions/${userId}`, sessionData);
+            await saveSession(sessionData);
             console.log("Session saved.");
         } catch (err) {
             console.error("Error saving session:", err);
@@ -65,7 +67,7 @@ const PomodoroTimer = () => {
     const fetchSessions = async () => {
         if (!userId) return;
         try {
-            const res = await axios.get(`http://localhost:8080/api/sessions/${userId}`);
+            const res = await getUserSessions();
             setSessions(res.data);
         } catch (err) {
             console.error("Error fetching sessions:", err);
@@ -156,7 +158,7 @@ const PomodoroTimer = () => {
 
                 <h4>Your Pomodoro Sessions</h4>
                 <ul>
-                    {sessions.map((s, i) => (
+                    {Array.isArray(sessions) && sessions.map((s, i) => (
                         <li key={i}>
                             {new Date(s.startTime).toLocaleString()} - {s.duration} min
                         </li>

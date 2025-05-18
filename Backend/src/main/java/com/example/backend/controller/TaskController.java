@@ -2,6 +2,7 @@ package com.example.backend.controller;
 
 import com.example.backend.service.TaskService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,9 +20,10 @@ public class TaskController {
         return ResponseEntity.ok(isDone);
     }
 
-    @DeleteMapping("/deleteTask/{userId}/{taskId}")
-    public ResponseEntity<Boolean> deleteTask(@PathVariable Long userId, @PathVariable Long taskId) {
-        taskService.deleteTaskById(userId, taskId);
+    @DeleteMapping("/deleteTask/{taskId}")
+    public ResponseEntity<Boolean> deleteTask( @PathVariable Long taskId, Authentication authentication) {
+        String email = authentication.getName();
+        taskService.deleteTaskById(email, taskId);
         return ResponseEntity.ok(true);
     }
 }

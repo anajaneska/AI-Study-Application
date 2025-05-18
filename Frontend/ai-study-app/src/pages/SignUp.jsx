@@ -1,8 +1,11 @@
 import { useState } from "react";
 import "./styling/SignUp.css";
 import { Link } from "react-router-dom";
+import { createUser } from "../services/userService";
+import { useNavigate } from "react-router-dom";
 
 function SignUp() {
+  const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState({
     name: "",
     surname: "",
@@ -12,14 +15,18 @@ function SignUp() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await fetch('http://localhost:8080/api/users', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(userInfo)  // Use userInfo instead of form
-    });
-    alert("User registered");
+    try {
+      console.log("User info:", userInfo);
+      await createUser(userInfo);
+      alert("User registered");
+      navigate("/logIn");
+    }
+    catch (error) {
+      console.error("Error creating user:", error);
+      alert("Error creating user");
+    }
   };
-  
+
 
   function handleCredentials(identifier, value) {
     setUserInfo((prevUserInfo) => ({

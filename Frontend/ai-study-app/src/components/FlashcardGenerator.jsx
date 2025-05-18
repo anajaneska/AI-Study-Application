@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import TestHistory from './TestHistory';
 import './FlashcardGenerator.css';
-import { 
-    getSummaries, 
-    getFlashcards, 
-    generateFlashcards, 
-    deleteFlashcards, 
+import {
+    getSummaries,
+    getFlashcards,
+    generateFlashcards,
+    deleteFlashcards,
     deleteSummary,
     getTestHistory,
     saveTestResult,
@@ -49,7 +49,7 @@ const FlashcardGenerator = () => {
 
     const loadTestHistory = async () => {
         if (!selectedSummaryId) return;
-        
+
         try {
             const response = await getTestHistory(selectedSummaryId);
             console.log('Test history response:', response.data);
@@ -65,7 +65,7 @@ const FlashcardGenerator = () => {
         setSelectedSummaryId(summaryId);
         setSelectedAnswer(null);
         setHasFlashcards(false);
-        
+
         if (summaryId) {
             try {
                 setLoading(true);
@@ -174,7 +174,7 @@ const FlashcardGenerator = () => {
 
             const response = await saveTestResult(numericSummaryId, requestBody);
             console.log('Test results saved successfully:', response.data);
-            
+
             setShowResults(true);
             setTestMode(false);
             setTestResults(response.data.questionResults || questionResults);
@@ -216,7 +216,7 @@ const FlashcardGenerator = () => {
 
     const handleDeleteFlashcards = async () => {
         if (!selectedSummaryId) return;
-        
+
         try {
             setLoading(true);
             await deleteFlashcards(selectedSummaryId);
@@ -234,7 +234,7 @@ const FlashcardGenerator = () => {
 
     const handleDeleteSummary = async () => {
         if (!selectedSummaryId) return;
-        
+
         try {
             setLoading(true);
             await deleteSummary(selectedSummaryId);
@@ -265,25 +265,25 @@ const FlashcardGenerator = () => {
             console.log('No summary selected or no summaries available');
             return [];
         }
-        
+
         const numericSummaryId = Number(selectedSummaryId);
         const selectedSummary = summaries.find(s => Number(s.id) === numericSummaryId);
-        
+
         if (!selectedSummary) {
             console.log('Selected summary not found');
             return [];
         }
-        
+
         console.log('Filtering test history:', {
             testHistory,
             selectedSummaryId: numericSummaryId,
             selectedSummaryTitle: selectedSummary.originalFileName
         });
-        
-        const filteredHistory = testHistory.filter(test => 
+
+        const filteredHistory = testHistory.filter(test =>
             test.summary && test.summary.id === numericSummaryId
         );
-        
+
         console.log('Filtered test history:', filteredHistory);
         return filteredHistory;
     };
@@ -294,24 +294,24 @@ const FlashcardGenerator = () => {
                 <>
                     <div className="summary-selector">
                         <h3>Select a Summary</h3>
-                        <select 
-                            value={selectedSummaryId || ''} 
+                        <select
+                            value={selectedSummaryId || ''}
                             onChange={handleSummaryChange}
                             className="summary-dropdown"
                         >
                             <option value="">Select a summary...</option>
-                            {summaries.map(summary => (
+                            {Array.isArray(summaries) && summaries.map(summary => (
                                 <option key={summary.id} value={summary.id}>
                                     {summary.originalFileName} {summary.hasFlashcards ? '(Has Flashcards)' : '(No Flashcards)'}
                                 </option>
                             ))}
                         </select>
-                        
+
                         <div className="button-group">
                             {selectedSummaryId && (
                                 <>
                                     {!hasFlashcards ? (
-                                        <button 
+                                        <button
                                             onClick={handleGenerateFlashcards}
                                             disabled={loading}
                                             className="generate-button"
@@ -320,13 +320,13 @@ const FlashcardGenerator = () => {
                                         </button>
                                     ) : (
                                         <>
-                                            <button 
+                                            <button
                                                 onClick={startTest}
                                                 className="test-button"
                                             >
                                                 Start Test
                                             </button>
-                                            <button 
+                                            <button
                                                 onClick={handleGenerateFlashcards}
                                                 disabled={loading}
                                                 className="generate-button"
@@ -334,29 +334,29 @@ const FlashcardGenerator = () => {
                                                 Generate New Flashcards
                                             </button>
                                             <button
-                                                    onClick={() => downloadFlashcards(selectedSummaryId)}
-                                                    style={{
-                                                        padding: "10px 16px",
-                                                        backgroundColor: "#2563eb",
-                                                        color: "white",
-                                                        border: "none",
-                                                        borderRadius: "8px",
-                                                        marginTop: "10px"
-                                                    }}
-                                                    >
-                                                    Download Flashcards
+                                                onClick={() => downloadFlashcards(selectedSummaryId)}
+                                                style={{
+                                                    padding: "10px 16px",
+                                                    backgroundColor: "#2563eb",
+                                                    color: "white",
+                                                    border: "none",
+                                                    borderRadius: "8px",
+                                                    marginTop: "10px"
+                                                }}
+                                            >
+                                                Download Flashcards
                                             </button>
 
                                         </>
                                     )}
-                                    <button 
+                                    <button
                                         onClick={handleDeleteFlashcards}
                                         disabled={loading || !hasFlashcards}
                                         className="delete-button"
                                     >
                                         Delete Flashcards
                                     </button>
-                                    <button 
+                                    <button
                                         onClick={handleDeleteSummary}
                                         disabled={loading}
                                         className="delete-button"
@@ -367,9 +367,9 @@ const FlashcardGenerator = () => {
                             )}
                         </div>
                     </div>
-                    
+
                     {selectedSummaryId && (
-                        <TestHistory 
+                        <TestHistory
                             testHistory={getFilteredTestHistory()}
                             onViewTest={handleViewTest}
                             onDeleteTest={handleDeleteTest}
@@ -393,7 +393,7 @@ const FlashcardGenerator = () => {
                             Finish Test
                         </button>
                     </div>
-                    
+
                     <div className="test-content">
                         <div className="flashcard">
                             <div className="question">{flashcards[currentIndex].question}</div>
@@ -409,7 +409,7 @@ const FlashcardGenerator = () => {
                                 ))}
                             </div>
                         </div>
-                        
+
                         <div className="test-navigation">
                             <button
                                 onClick={handlePrevious}

@@ -19,6 +19,7 @@ function LogIn() {
     try {
       await loginUser(userInfo.lEmail, userInfo.lPassword);
       navigate("/");
+      window.location.reload();
     }
     catch (error) {
       setUserInfo((prev) => ({ ...prev, lPassword: "" }));

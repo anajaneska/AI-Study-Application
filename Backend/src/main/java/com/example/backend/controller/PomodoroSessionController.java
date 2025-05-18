@@ -4,6 +4,7 @@ import com.example.backend.model.PomodoroSession;
 import com.example.backend.service.PomodoroSessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,13 +17,15 @@ public class PomodoroSessionController {
     @Autowired
     private PomodoroSessionService sessionService;
 
-    @PostMapping("/{userId}")
-    public ResponseEntity<PomodoroSession> saveSession(@PathVariable Long userId, @RequestBody PomodoroSession session) {
-        return ResponseEntity.ok(sessionService.saveSession(userId, session));
+    @PostMapping("")
+    public ResponseEntity<PomodoroSession> saveSession(@RequestBody PomodoroSession session, Authentication authentication) {
+        String email = authentication.getName();
+        return ResponseEntity.ok(sessionService.saveSession(email, session));
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<List<PomodoroSession>> getUserSessions(@PathVariable Long userId) {
-        return ResponseEntity.ok(sessionService.getSessionsByUser(userId));
+    @GetMapping("")
+    public ResponseEntity<List<PomodoroSession>> getUserSessions(Authentication authentication) {
+        String email = authentication.getName();
+        return ResponseEntity.ok(sessionService.getSessionsByUser(email));
     }
 }

@@ -12,6 +12,7 @@ import Calendar from "./pages/Calendar.jsx";
 function App() {
   const user = localStorage.getItem('user');
   const parsedUser = user ? JSON.parse(user) : null;
+  console.log("Parsed user:", parsedUser);
 
   return (
     <Router>
@@ -19,19 +20,26 @@ function App() {
         <Link to="/" className="nav-link">
           AI Study Application
         </Link>
-        <Link to="/logIn" className="nav-link">
-          Log In
-        </Link>
-        <Link to="/SignUp" className="nav-link">
-          Sign Up
-        </Link>
         <Link to="/Summarizer" className="nav-link">
           Summarizer
         </Link>
         <Link to="/Flashcards" className="nav-link">
           Flashcards
         </Link>
+        <div style={{ flex: 1 }} />
         {parsedUser ? (<span className="user-info">Welcome, {parsedUser}!</span>) : (<span></span>)}
+        {parsedUser ? (<Link to="/logIn" className="nav-link" onClick={() => {
+          localStorage.removeItem("jwt");
+          localStorage.removeItem("user");
+          window.location.reload();
+        }}>
+          Log Out
+        </Link>) : (<><Link to="/logIn" className="nav-link">
+          Log In
+        </Link>
+          <Link to="/SignUp" className="nav-link">
+            Sign Up
+          </Link></>)}
       </nav>
 
       <Routes>
